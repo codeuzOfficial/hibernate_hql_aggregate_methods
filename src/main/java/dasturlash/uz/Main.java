@@ -9,14 +9,12 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
 
-import java.util.List;
-import java.util.Locale;
-
 public class Main {
     public static void main(String[] args) {
 //        insertStudents();
 //        simpleForm();
-        distinctExample();
+//        distinctExample();
+        useAll();
     }
 
     private static void simpleForm() {
@@ -51,6 +49,31 @@ public class Main {
         session.close();
     }
 
+    private static void useAll() {
+        StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
+        Metadata meta = new MetadataSources(ssr).getMetadataBuilder().build();
+
+        SessionFactory factory = meta.getSessionFactoryBuilder().build();
+        Session session = factory.openSession();
+
+        String sql = "select count(*), sum(age), max(age), min(age),  avg(age) From StudentEntity";
+        Query<Object[]> query = session.createQuery(sql);
+        Object[] objs = query.uniqueResult();
+        Long count = (Long) objs[0];
+        Long sum = (Long) objs[1];
+        Integer max = (Integer) objs[2];
+        Integer min = (Integer) objs[3];
+        Double avg = (Double) objs[4];
+
+        System.out.println(count);
+        System.out.println(sum);
+        System.out.println(max);
+        System.out.println(min);
+        System.out.println(avg);
+
+        factory.close();
+        session.close();
+    }
 
     public static void insertStudents() {
         StandardServiceRegistry ssr = new StandardServiceRegistryBuilder().configure("hibernate.cfg.xml").build();
